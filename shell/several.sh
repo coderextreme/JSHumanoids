@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -euo pipefail
+set -euo pipefail
 IFS=$'\n\t'
 
 # convert X3D fils to GraalJS
@@ -50,5 +50,7 @@ do
 	      ../shell/jjs.sh "$i"
 	echo "../shell/rescale.sh $i"
 	      ../shell/rescale.sh "$i"
+	echo "../shell/reorient.sh $i"
+	      ../shell/reorient.sh "$i"
 	popd
 done
