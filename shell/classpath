@@ -3,11 +3,11 @@
 export HOMESFOLDER=C:/Users
 export USERNAME=john
 export GRAALJS=C:/graaljs-community-jvm-23.1.2-windows-amd64/graaljs-community-23.1.2-windows-amd64/bin/js.exe
-export X3DJSONLD=${HOMESFOLDER}/$USERNAME/JSHumanoids
-export GRAALX3DJSONLD=${HOMESFOLDER}/$USERNAME/JSHumanoids
-export CLASSPATH=".;../java;${HOMESFOLDER}/$USERNAME/JSHumanoids/lib/X3DJSAIL.4.0.full.jar;${X3DJSONLD}/java;${X3DJSONLD}/lib/saxon-he-12.1.jar"
+export X3DJSONLD=..
+export GRAALX3DJSONLD=..
+export CLASSPATH=".;${X3DJSONLD}/java;${X3DJSONLD}/lib/X3DJSAIL.4.0.full.jar;${X3DJSONLD}/java;${X3DJSONLD}/lib/saxon-he-12.1.jar;${X3DJSONLD}/graaljs"
 # GRAAL DOES NOT TAKE C:
-export GRAAL_CLASSPATH=".;../java;${HOMESFOLDER}/$USERNAME/JSHumanoids/lib/X3DJSAIL.4.0.full.jar;${GRAALX3DJSONLD}/lib/saxon-he-12.1.jar;${GRAALX3DJSONLD}/graaljs"
+export GRAAL_CLASSPATH=".;${X3DJSONLD}/java;${HOMESFOLDER}/$USERNAME/JSHumanoids/lib/X3DJSAIL.4.0.full.jar;${X3DJSONLD}/lib/saxon-he-12.1.jar;${X3DJSONLD}/graaljs"
 export PYTHONPATH="{PYTHONPATH};C:\\Python311\\Lib;c:\\x3d-code\\www.web3d.org\\x3d\\stylesheets\\python"
 export PATH="${JAVA_HOME}/bin:${JAVA_HOME}/jre/bin/server:${PATH}"
 
