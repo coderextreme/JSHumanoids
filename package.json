@@ -1,0 +1,14 @@
+{
+  "name": "JSHumanoids",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.8",
+    "ajv": "8.12.0",
+    "ajv-formats": "^2.1.1",
+    "ajv-i18n": "*",
+    "node-mkdirp": "*"
+  },
+  "scripts": {
+  }
+}
