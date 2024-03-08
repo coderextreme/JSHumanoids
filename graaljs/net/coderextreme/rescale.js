@@ -55,7 +55,7 @@ function main() {
 		print(e);
 	}
 	
-	X3D0.toFileX3D(humanoid.getName()+"scaled"+count+".x3d");
+	X3D0.toFileX3D("../data/"+humanoid.getName()+".scaled"+count+".x3d");
 
 	HUMANCHILD = 3;
 	height = 1.87;
