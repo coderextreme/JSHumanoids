@@ -50,7 +50,7 @@ function main() {
 		yscale = maxy - miny;
 		scaledHeight = yscale * scale[1];
 		print("max y "+maxy+" min y "+miny+" yscale "+yscale+" height "+height);
-		transformNode(root, translation, scale);
+		transformNode(root, translation, scale, humanoid);
 	} catch (e) {
 		print(e);
 	}
@@ -145,27 +145,27 @@ function centering(joint) {
 }
 function transformPoint(point, point_offset, translation, scale) {
 	var newPoint = point.map(item => item);
-	print("");
-	print("point_offset", point_offset);
-	print("in  trans", translation[0], translation[1], translation[2]);
-	print("in  scale", scale[0], scale[1], scale[2]);
-	print("in  point", point[point_offset+0], point[point_offset+1], point[point_offset+2]);
+	//print("");
+	//print("point_offset", point_offset);
+	//print("in  trans", translation[0], translation[1], translation[2]);
+	//print("in  scale", scale[0], scale[1], scale[2]);
+	//print("in  point", point[point_offset+0], point[point_offset+1], point[point_offset+2]);
 
 	newPoint[point_offset+0] = newPoint[point_offset+0] + translation[0];
 	newPoint[point_offset+1] = newPoint[point_offset+1] + translation[1];
 	newPoint[point_offset+2] = newPoint[point_offset+2] + translation[2];
 
-	print("mid point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
-	print("out scale", scale[0], scale[1], scale[2]);
+	//print("mid point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
+	//print("out scale", scale[0], scale[1], scale[2]);
 
 	newPoint[point_offset+0] = newPoint[point_offset+0] * scale[0];
 	newPoint[point_offset+1] = newPoint[point_offset+1] * scale[1];
 	newPoint[point_offset+2] = newPoint[point_offset+2] * scale[2];
 
-	print("out point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
+	//print("out point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
 	return Java.to(newPoint, Java.type("double[]"));
 }
-function transformNode(node, parentTranslation, scale) {
+function transformNode(node, parentTranslation, scale, parentNode) {
 	var storedTranslation = [parentTranslation[0], parentTranslation[1], parentTranslation[2]];
 	var children = null;
 	if (node instanceof HAnimJoint) {
@@ -175,7 +175,7 @@ function transformNode(node, parentTranslation, scale) {
 		storedTranslation[0] += translation[0];
 		storedTranslation[1] += translation[1];
 		storedTranslation[2] += translation[2];
-		print("is a joint", storedTranslation);
+		// print("is a joint", storedTranslation);
 
 		var center = joint.getCenter();
 		center = transformPoint(center, 0, storedTranslation, scale);
@@ -201,14 +201,14 @@ function transformNode(node, parentTranslation, scale) {
 		var segment = node;
 		var coord = segment.getCoord();
 		if (coord !== null) {
-			if (!transformNode(coord, storedTranslation, scale)) {
+			if (!transformNode(coord, storedTranslation, scale, node)) {
 				print("Unpacking coord in transformNode() HAnimSegment failed");
 			}
 		}
 		var displacers = segment.getDisplacersList();
 		if (displacers !== null) {
 			for (var displacer in displacers) {
-				if (!transformNode(displacers[displacer], storedTranslation, scale)) {
+				if (!transformNode(displacers[displacer], storedTranslation, scale, node)) {
 					print("Unpacking displacer in HAnimSegment failed");
 				}
 			}
@@ -223,17 +223,32 @@ function transformNode(node, parentTranslation, scale) {
 		storedTranslation[0] += translation[0];
 		storedTranslation[1] += translation[1];
 		storedTranslation[2] += translation[2];
-		transform.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));
 
-		children = transform.getChildrenList();
+		try {
+			if (transform.getDEF() || transform.getName()) {  // add more defaults, so we won't delete the node, if there's more than children data
+				transform.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));  // Transform should be abandoned, but result leads to NO-OP
+				children = transform.getChildrenList();
+			} else {
+				print("Deleting ALL nodes below ", parentNode, parentNode.getDEF(), parentNode.getName(), ", not just the singleton Transform");
+				let transformArray = transform.getChildren(); 
+				let parentArray = transformArray.clone();
+				// TODO delete the ONE transform, not the whole parentNode array
+				parentNode.setChildren(parentArray);
+				children = parentNode.getChildrenList();
+			}
+		} catch (e) {
+			print("error ", e);
+		}
+
+
 	} else if (node instanceof Shape) {
 		var shape = node;
 		var appearance = shape.getAppearance();
-		if (!transformNode(appearance, storedTranslation, scale)) {
+		if (!transformNode(appearance, storedTranslation, scale, node)) {
 			print("Unpacking appearance in Shape failed");
 		}
 		var geometry = shape.getGeometry();
-		if (!transformNode(geometry, storedTranslation, scale)) {
+		if (!transformNode(geometry, storedTranslation, scale, node)) {
 			print("Unpacking geometry in Shape failed");
 		}
 	} else if (node instanceof IndexedFaceSet) {
@@ -245,7 +260,7 @@ function transformNode(node, parentTranslation, scale) {
 			var texCoordIndex = ifs.getTexCoordIndex();
 			print("texCoordIndex "+texCoordIndex.length);
 		}
-		if (coord !== null && !transformNode(coord, storedTranslation, scale)) {
+		if (coord !== null && !transformNode(coord, storedTranslation, scale, node)) {
 			print("Unpacking coord in IndexedFaceSet failed");
 		}
 	} else if (node instanceof Appearance) {
@@ -266,7 +281,7 @@ function transformNode(node, parentTranslation, scale) {
 	if (children !== null) {
 		for (var child in children) {
 			var copyTranslation = [storedTranslation[0], storedTranslation[1], storedTranslation[2]];
-			if (children[child] === null || !transformNode(children[child], copyTranslation, scale)) {
+			if (children[child] === null || !transformNode(children[child], copyTranslation, scale, node)) {
 				print("Unpacking child "+children[child]+" failed");
 			}
 		}
