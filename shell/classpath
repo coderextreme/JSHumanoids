@@ -1,8 +1,9 @@
 #!/bin/bash
 # Window defines this, use ${USERNAME:....} something instead
 export HOMESFOLDER=C:/Users
-export USERNAME=john
-export GRAALJS=C:/graaljs-community-jvm-23.1.2-windows-amd64/graaljs-community-23.1.2-windows-amd64/bin/js.exe
+export USERNAME=jcarl
+#export GRAALJS=C:/graaljs-community-jvm-23.1.2-windows-amd64/graaljs-community-23.1.2-windows-amd64/bin/js.exe
+export GRAALJS=${HOMESFOLDER}/$USERNAME/Downloads/graaljs-community-jvm-24.0.2-windows-amd64/graaljs-community-24.0.2-windows-amd64/bin/js.exe
 export X3DJSONLD=..
 export GRAALX3DJSONLD=..
 export CLASSPATH=".;${X3DJSONLD}/java;${X3DJSONLD}/lib/X3DJSAIL.4.0.full.jar;${X3DJSONLD}/java;${X3DJSONLD}/lib/saxon-he-12.1.jar;${X3DJSONLD}/graaljs"
