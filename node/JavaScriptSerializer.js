@@ -40,6 +40,8 @@ JavaScriptSerializer.prototype = {
 		str += "function doubleToFloat(d) {\n";
 		str += "    if (Float32Array)\n";
         	str += "	return new Float32Array([d])[0];\n";
+		str += "    else\n";
+		str += "        return d;\n";
 		str += "}\n";
 		// we figure out body first and print it out later
 		var body = "      var "+element.nodeName+0+" =  new "+element.nodeName+"()";
