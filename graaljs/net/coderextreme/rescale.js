@@ -16,7 +16,7 @@ var r_x = 0;
 var r_z = 0;
 var maxy = 0;
 var z = 0;
-var scale = [ 1, 1, 1 ];
+// var scale = [ 1, 1, 1 ];
 var yscale = 1;
 
 main();
@@ -28,31 +28,44 @@ function main() {
 	print("humanoid", typeof humanoid, humanoid, JSON.stringify(humanoid));
 	print(humanoid.getName());
 	print(humanoid.getDEF());
-	scale = humanoid.getScale();
-	print("scale out", scale);
+	var scale = humanoid.getScale();
+	print("scale", JSON.stringify(scale));
+	print("scale input", scale);
 	humanoid.setScale(Java.to([ 1, 1, 1 ], Java.type("double[]")));
-	print("scale in", humanoid.getScale());
+	print("scale output", humanoid.getScale());
 	var root = humanoid.getSkeleton()[0];
 	// for (var i in root) { print(i); }
-	print("root", root, JSON.stringify(root), root.getName());
-	var center = root.getCenter();
-	print("center", center);
-	print(center[0]+" "+center[1]+" "+center[2]);
-	x = center[0];
-	miny = center[1];
-	maxy = center[1];
-	z = center[2];
-	var translation = [0, 0, 0];
-	try {
-		centering(root);
-		x = (l_x + r_x) / 2;
-		z = (l_z + r_z) / 2;
-		yscale = maxy - miny;
-		scaledHeight = yscale * scale[1];
-		print("max y "+maxy+" min y "+miny+" yscale "+yscale+" height "+height);
-		transformNode(root, translation, scale, humanoid);
-	} catch (e) {
-		print(e);
+	if (root != null) {
+		print("root", root, JSON.stringify(root), root.getName());
+		var center = root.getCenter();
+		print("center", center);
+		print(center[0]+" "+center[1]+" "+center[2]);
+		x = center[0];
+		miny = center[1];
+		maxy = center[1];
+		z = center[2];
+		var translation = [0, 0, 0];
+		try {
+			centering(root);
+			x = (l_x + r_x) / 2;
+			z = (l_z + r_z) / 2;
+			yscale = maxy - miny;
+			scaledHeight = yscale * scale[1];
+			print("max y "+maxy+" min y "+miny+" yscale "+yscale+" height "+height);
+			transformNode(root, translation, scale, humanoid);
+		} catch (e) {
+			print(e);
+		}
+	} else {
+		var translation = [0, 0, 0];
+		transformNode(humanoid, translation, scale, humanoid);
+		var scene = X3D0.getScene();
+		scale = humanoid.getScale();
+		print("scale", JSON.stringify(scale));
+		translation = [0, 0, 0];
+		transformNode(scene, translation, scale, X3D0);
+		scale = humanoid.getScale();
+		print("scale", JSON.stringify(scale));
 	}
 	
 	X3D0.toFileX3D("../data/"+humanoid.getName()+".scaled"+count+".x3d");
@@ -168,7 +181,11 @@ function transformPoint(point, point_offset, translation, scale) {
 function transformNode(node, parentTranslation, scale, parentNode) {
 	var storedTranslation = [parentTranslation[0], parentTranslation[1], parentTranslation[2]];
 	var children = null;
-	if (node instanceof HAnimJoint) {
+	if (node instanceof HAnimHumanoid) {
+		children = node.getSkin();
+	} else if (node instanceof Scene) {
+		children = node.getChildren();
+	} else if (node instanceof HAnimJoint) {
 		var joint = node;
 
 		var translation = joint.getTranslation();

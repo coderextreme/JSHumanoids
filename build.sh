@@ -15,5 +15,5 @@ cp /c/x3d-code/www.web3d.org/x3d/stylesheets/X3dToJson.xslt lib/stylesheets
 #popd
 
 pushd shell
-bash several.sh ../data/JinLOA4.x3d
+bash several.sh ../data/JinLOA4.x3d ../data/Jin_LOA4-V2SingleMesh.x3d
 popd
