@@ -3,3 +3,6 @@ node_modules/
 *.class
 *.bak
 target/
+data/humanoid.scaled1.x3d
+graaljs/reorient.x3d
+lib/X3DJSAIL.4.0.full.jar
