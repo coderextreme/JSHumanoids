@@ -1,5 +1,4 @@
-// X3D JSON Script expander
-class LOG {
+export class LOG {
 	constructor() {
 		this.array = [];
 	}
@@ -14,7 +13,7 @@ class LOG {
 	}
 }
 
-class Packages {
+export class Packages {
         constructor () {
 		this.packages = {};
 	}
@@ -30,9 +29,9 @@ class Packages {
 
 // there are multiple scripts per package
 
-let packages = new Packages();
+export let packages = new Packages();
 
-class Script {
+export class Script {
 	constructor (mypackage, name) {
 		// this.setters = {};
 		// this.getters = {};
@@ -59,9 +58,9 @@ class Script {
 	}
 }
 
-var X3DJSON = {}; // global
+export let X3DJSON = {}; // global
 
-class Scripts {
+export class Scripts {
 	runAllRoutes() {
 		for (let r in X3DJSON.runRoutes) {
 			X3DJSON.runRoutes[r]();
@@ -257,9 +256,6 @@ class Scripts {
 		classes.log("		};");	
 		classes.log("	}};");
 		classes.log("}");
-		classes.log("if (typeof $ !== 'function') {");
-		classes.log("	$ = function() { return { attr : function() {}, 0 : null }; };");
-		classes.log("}");
 		classes.log(this.nodeUtil(selector, true)+" = function(selector, node, field, value) {");
 		classes.log("		if (typeof selector === 'undefined') {");
 		classes.log("			selector = \"\";");
@@ -281,7 +277,7 @@ class Scripts {
 		classes.log("			if (value && typeof value.toString === 'function') {");
 		classes.log("				value = value.toString();");
 		classes.log("			}");
-		classes.log("			$(selector).attr(field, value);");
+		classes.log("			document.querySelector(selector).setAttribute(field, value);");
 		classes.log("			// console.log('set', node, '.', field, '=', value);");
 		classes.log("			*/");
 		classes.log("			try {");
@@ -312,7 +308,7 @@ class Scripts {
 		classes.log("			// console.log('get', node, '.', field,'=',value);");
 		classes.log("			return value;");
 		classes.log("		} else if (arguments.length > 0) {");
-		classes.log("			return $(selector)[0];");
+		classes.log("			return document.querySelector(selector);");
 		classes.log("		} else {");
 		classes.log("			return;");
 		classes.log("		}");
@@ -775,13 +771,4 @@ class Scripts {
 		classes.log('if (typeof '+this.useX3DJSON('Obj', selector, url,mypackage.name)+'.initialize === "function") '+this.useX3DJSON('Obj', selector, url, mypackage.name) + '.initialize();');
 	}
 
-}
-
-module.exports = {
-	LOG:LOG,
-	Packages:Packages,
-	packages:packages,
-	Script:Script,
-	Scripts:Scripts,
-	X3DJSON:X3DJSON
 }

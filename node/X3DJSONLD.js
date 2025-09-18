@@ -1,40 +1,14 @@
 "use strict";
 
+import xmldom from '@xmldom/xmldom';
 if (typeof window === 'undefined') {
-	var window = {};
-	if (typeof window.document === 'undefined') {
-	       window.document = {};
-
-	}
+  var fs = await import('fs');
+  var http = await import('http');
+  var https = await import('https');
 }
-if (typeof require !== 'function') {
-	window.require = function() {
-		console.log("Redefinining require on browser");
-		return undefined;
-	};
-}
-
-var xmldom = require('@xmldom/xmldom');
-if (typeof DOMSerializer === 'undefined') {
-	var DOMSerializer = require('./DOMSerializer.js');
-}
-if (typeof DOMSerializer === 'undefined') {
-	DOMSerializer = window.DOMSerializer;
-}
-var http = require("http");
-var https = require("https");
-// TODO this causes node-java 0.12.2 to hang
-// var runAndSend = require("./runAndSend");
-var fs = require('fs');
-
+import DOMSerializer from './DOMSerializer.js';
 
 if (typeof load !== 'function') {
-	fs = require("fs");
-	http = require("http");
-	https = require("https");
-	// TODO this causes node-java 0.12.2 to hang
-	// var runAndSend = require("./runAndSend");
-	var xmldom = require('@xmldom/xmldom');
 	if (typeof xmldom !== 'undefined') {
 		var domserializer = new xmldom.XMLSerializer();
 		var DOMParser = xmldom.DOMParser;
@@ -186,7 +160,7 @@ loadURLs : function(loadpath, urls, loadedCallback, protoexp, done, externProtoD
 							$.get(url, function(data) {
 								loadedCallback(data, url, protoexp, done, externProtoDeclare, obj);
 							});
-						} else if (typeof http !== 'undefined') {
+						} else if (typeof http === 'object') {
 							http.get({ host: host, path: path}, function(res) {
 								var data = '';
 								res.on('data', function (d) {
@@ -204,7 +178,7 @@ loadURLs : function(loadpath, urls, loadedCallback, protoexp, done, externProtoD
 							$.get(url, function(data) {
 								loadedCallback(data, url, protoexp, done, externProtoDeclare, obj);
 							});
-						} else if (typeof https !== 'undefined') {
+						} else if (typeof https === 'object') {
 							https.get({ host: host, path: path}, function(res) {
 								var data = '';
 								res.on('data', function (d) {
@@ -216,7 +190,7 @@ loadURLs : function(loadpath, urls, loadedCallback, protoexp, done, externProtoD
 							});
 					
 						}
-					} else if (typeof fs !== 'undefined' && protocol.indexOf("http") !== 0) {
+					} else if (typeof fs === 'object' && protocol.indexOf("http") !== 0) {
 						// should be async, but out of memory
 						// console.error("Loading FILE URL", url);
 						var hash = url.indexOf("#");
@@ -566,7 +540,9 @@ ConvertToX3DOM : function(xmlDoc, object, parentkey, element, path, containerFie
 			if (arrayOfStrings) {
 				arrayOfStrings = false;
 				for (var str in localArray) {
-					localArray[str] = X3DJSONLD.SFStringToXML(localArray[str]);
+					if (typeof localArray[str] === 'string') {
+						localArray[str] = X3DJSONLD.SFStringToXML(localArray[str]);
+					}
 				}
                                 if (parentkey === '@url' || parentkey.indexOf("Url") === parentkey.length - 3) {
 					// console.error("Load array  is",localArray);
@@ -696,9 +672,6 @@ serializeDOM : function(json, element, appendDocType) {
 	if (typeof element === 'string') {
 		xml += element;
 	} else if (typeof element !== 'undefined') {
-		if (typeof DOMSerializer === 'undefined') {
-			DOMSerializer = window.DOMSerializer;
-		}
 		var domserial = new DOMSerializer();
 		xml += domserial.serializeToString(json, element);
 	}
@@ -742,6 +715,5 @@ setDocument : function(doc) {
 }
 
 var Browser = X3DJSONLD.Browser;
-window.X3DJSONLD = X3DJSONLD;
 
-module.exports = X3DJSONLD;
+export default X3DJSONLD;

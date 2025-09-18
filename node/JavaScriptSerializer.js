@@ -1,6 +1,10 @@
 "use strict";
 
-function JavaScriptSerializer () {
+if (typeof require !== 'undefined') {
+	var fs = require("fs")
+}
+
+export default function JavaScriptSerializer () {
 this.DOUBLE_SUFFIX = '';
 this.FLOAT_SUFFIX = '';
 
@@ -31,17 +35,19 @@ JavaScriptSerializer.prototype = {
 		clz = clz.replace(/^([0-9].*|default$)/, "_$1")
 		var pkg = pc.substr(0, c).replace(/[\/\\]/g, ".").trim();
 
-		str += "load('X3Dautoclass.js');\n";
+		if (typeof fs === 'object') {
+			str += fs.readFileSync("../graaljs/net/coderextreme/data/X3Dautoclass.js").toString();
+		} else {
+			str += "load('X3Dautoclass.js');\n";
+		}
 		str += "var ConfigurationProperties = Packages.org.web3d.x3d.jsail.ConfigurationProperties;\n";
-		str += "ConfigurationProperties.showDefaultAttributes = false;\n";
-		str += "ConfigurationProperties.xsltEngine = ConfigurationProperties.XSLT_ENGINE_NATIVE_JAVA;\n";
-		str += "ConfigurationProperties.deleteIntermediateFiles = false;\n";
+		str += "ConfigurationProperties.setXsltEngine(ConfigurationProperties.XSLT_ENGINE_NATIVE_JAVA);\n";
+		str += "ConfigurationProperties.setDeleteIntermediateFiles(false);\n";
 		str += "ConfigurationProperties.setStripTrailingZeroes(true);\n";
+		str += "ConfigurationProperties.setStripDefaultAttributes(true);\n";
 		str += "function doubleToFloat(d) {\n";
 		str += "    if (Float32Array)\n";
-        	str += "	return new Float32Array([d])[0];\n";
-		str += "    else\n";
-		str += "        return d;\n";
+        	str += "	return new Float32Array(d);\n";
 		str += "}\n";
 		// we figure out body first and print it out later
 		var body = "      var "+element.nodeName+0+" =  new "+element.nodeName+"()";
@@ -56,8 +62,9 @@ JavaScriptSerializer.prototype = {
 				str += this.postcode[postno];
 			}
 		}
-		// str += "    "+element.nodeName+0+".toFileX3D(\""+clazz+".new.graal.x3d\");\n";
-		// str += "    "+element.nodeName+0+".toFileJSON(\""+clazz+".new.graal.json\");\n";
+		str += "    "+element.nodeName+0+".toFileX3D(\""+clazz+"_new_graal.x3d\");\n";
+		str += "    "+element.nodeName+0+".toFileJSON(\""+clazz+"_new_graal.json\");\n";
+		str += "    "+element.nodeName+0+".toFileVRML97(\""+clazz+"_new_graal.wrl\");\n";
 
 		return str;
 	},
@@ -71,11 +78,10 @@ JavaScriptSerializer.prototype = {
 			}
 		}
 		if (type === "float") {
-			for (var v in values) {
-				values[v] = "doubleToFloat("+values[v]+")";
-			}
+			return 'Java.to(doubleToFloat(['+lead+values.join(j)+trail+']), Java.type("'+type+'[]"))';
+		} else {
+			return 'Java.to(['+lead+values.join(j)+trail+'], Java.type("'+type+'[]"))';
 		}
-		return 'Java.to(['+lead+values.join(j)+trail+'], Java.type("'+type+'[]"))';
 	},
 
 	printParentChild : function (element, node, cn, mapToMethod, n) {
@@ -271,7 +277,6 @@ JavaScriptSerializer.prototype = {
 						attrs[a].nodeValue === "skin" ||
 						attrs[a].nodeValue === "skinCoord" ||
 						attrs[a].nodeValue === "sites")) {
-						// console.log("################## FOUND", attr, attrs[a].nodeValue);
 						attr = "containerFieldOverride";
 
 					} else if (attr === "xmlns:xsd" || attr === "xsd:noNamespaceSchemaLocation" || attr === 'containerField' || attr === 'type') {
@@ -408,7 +413,6 @@ JavaScriptSerializer.prototype = {
 					
 					str += '.'+method+"("+strval+")";
 					if (attr === 'containerFieldOverride' && (attrs[a].nodeValue === "joints" || attrs[a].nodeValue === "segments" || attrs[a].nodeValue === "viewpoints" || attrs[a].nodeValue === "skinCoord" || attrs[a].nodeValue === "skin" || attrs[a].nodeValue === "sites")) {
-					// console.log("################## FOUND", method, attrs[a].nodeValue);
 						// str += ")"; // for cast
 					}
 				}
@@ -486,9 +490,6 @@ JavaScriptSerializer.prototype = {
 					return x.
 					        replace(/\\/g, '\\\\').
 						replace(/"/g, '\\"');
-						/*
-						replace(/\\n/g, "\\\\n")
-						*/
 					;
 					}).join('\\n\"+\n\"')+'`)';
 			}
@@ -496,4 +497,3 @@ JavaScriptSerializer.prototype = {
 		return str;
 	}
 };
-module.exports = JavaScriptSerializer;

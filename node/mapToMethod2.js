@@ -15,7 +15,8 @@ var mapToMethod2 = {
 	"Appearance" : {
 		"ProtoInstance" : "addShaders",
 		"ProgramShader" : "addShaders",
-		"ComposedShader" : "addShaders"
+		"ComposedShader" : "addShaders",
+		"Script" : "addChild"
 	},
 	"ComposedShader" : {
 		"field" : "addField"
@@ -77,4 +78,4 @@ var mapToMethod2 = {
 		"HAnimJoint" : "addChild"
 	}
 };
-module.exports = mapToMethod2;
+export default mapToMethod2;

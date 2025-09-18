@@ -1,19 +1,15 @@
 "use strict";
 
-// Convert X3D JSON to various formats
+// Convert X3D JSON to JAVA
 
 process.argv.shift();
 process.argv.shift();
 
-var convertJSON = require("./convertJSON.js");
-console.log(convertJSON.convertJSON);
+import convertJSON from "./convertJSON.js";
 
-convertJSON.convertJSON([
-	{ 
-	serializer : './JavaScriptSerializer.js',
+convertJSON([{ 
+	serializer : 'JavaScriptSerializer',
 	folder : "../graaljs/net/coderextreme/",
 	extension : ".js",
-	codeOutput : "../"
-	}
-	]);
-process.exit(0);
+	codeOutput : "../",
+	}]);
