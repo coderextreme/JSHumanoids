@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.8",
-    "ajv": "*",
-    "ajv-formats": "*",
-    "ajv-formats-draft2019": "*",
-    "ajv-i18n": "*"
+    "@xmldom/xmldom": "0.9.9",
+    "ajv": "8.18.0",
+    "ajv-formats": "3.0.1",
+    "ajv-formats-draft2019": "1.6.1",
+    "ajv-i18n": "4.2.0"
   },
   "scripts": {
   }
