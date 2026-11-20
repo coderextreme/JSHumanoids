@@ -5634,7 +5634,7 @@ key='0 0.5 1' keyValue='0 1 0 1, 0 1 0 1, 0 1 0 1'/>
 </Group>
 
 
-<Group DEF='Pose T Animation_loa4'>
+<Group DEF='Pose_T_Animation_loa4'>
  <TimeSensor DEF='PoseTTimer' cycleInterval='5.5' loop='true'/>
  <!-- indention to match Joint hierarchy -->
  <PositionInterpolator DEF='PoseT_humanoid_root_TranslationInterpolator' key='0 0.5 1' keyValue='0 0 0, 0 -0.025 0, 0 0 0'/>
@@ -6094,7 +6094,7 @@ keyValue='
                            <ROUTE fromField='value_changed' fromNode='PoseT_r_carpal_distal_interphalangeal_5_RotationInterpolator' toField='set_rotation' toNode='hanim_r_carpal_distal_interphalangeal_5'/>
 </Group> 
 
-<Group DEF='Pose A Animation_loa4'>
+<Group DEF='Pose_A_Animation_loa4'>
  <TimeSensor DEF='PoseATimer' cycleInterval='5.5' loop='true'/>
  <!-- indention to match Joint hierarchy -->
  <PositionInterpolator DEF='PoseA_humanoid_root_TranslationInterpolator' key='0 0.5 1' keyValue='0 -0.02 0, 0 -0.02 0, 0 -0.02 0'/>
@@ -6543,7 +6543,7 @@ keyValue='
 </Group> 
 
 
-<Group DEF='Pose H Animation_loa4'>
+<Group DEF='Pose_H_Animation_loa4'>
  <TimeSensor DEF='PoseHTimer' cycleInterval='5.5' loop='true'/>
  <!-- indention to match Joint hierarchy -->
  <PositionInterpolator DEF='PoseH_humanoid_root_TranslationInterpolator' key='0 0.5 1' keyValue='0 0 0, 0 0 0, 0 0 0'/>
@@ -12724,11 +12724,12 @@ keyValue='0 0 1 0 0 0 1 0 0 0 1 1.5 0 0 1 0'/>
                            <ROUTE fromField='value_changed' fromNode='Kick2_r_carpal_distal_interphalangeal_5_RotationInterpolator' toField='set_rotation' toNode='hanim_r_carpal_distal_interphalangeal_5'/>
 </Group>
 
-<Group DEF='Skin Jin'>
-  <Transform DEF='ScaleForSkin' scale='0.009445 0.009445 0.009445'>
+<Group DEF='Skin_Jin'>
+  <Transform DEF='ScaleForSkin'>
     <HAnimHumanoid DEF='Skin_hanim_HAnim'
         name='Skin_HAnim'
-        info='"humanoidVersion=2.0"'
+	    info='"humanoidVersion=2.0"'
+	    scale='0.009445 0.009445 0.009445'
         version='2.0' >
       <HAnimJoint DEF='Skin_hanim_humanoid_root' containerField='skeleton'
           name='Skin_humanoid_root'
@@ -12900,7 +12901,7 @@ keyValue='0 0 1 0 0 0 1 0 0 0 1 1.5 0 0 1 0'/>
         <ROUTE fromField='value_changed' fromNode='Default_r_elbow_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_elbow'/>
           <ROUTE fromField='value_changed' fromNode='Default_r_radiocarpal_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_radiocarpal'/>
 
-<!--  Pose T Animation to Skin_Joints -->
+<!--  Pose_T_Animation to Skin_Joints -->
 <ROUTE fromField='value_changed' fromNode='PoseT_humanoid_root_TranslationInterpolator' toField='set_translation' toNode='Skin_hanim_humanoid_root'/>
 <ROUTE fromField='value_changed' fromNode='PoseT_humanoid_root_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_humanoid_root'/>
  <ROUTE fromField='value_changed' fromNode='PoseT_sacroiliac_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_sacroiliac'/>
@@ -12921,7 +12922,7 @@ keyValue='0 0 1 0 0 0 1 0 0 0 1 1.5 0 0 1 0'/>
         <ROUTE fromField='value_changed' fromNode='PoseT_r_elbow_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_elbow'/>
           <ROUTE fromField='value_changed' fromNode='PoseT_r_radiocarpal_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_radiocarpal'/>
 
-<!--  Pose A Animation to Skin_Joints -->
+<!--  Pose_A_Animation to Skin_Joints -->
 <ROUTE fromField='value_changed' fromNode='PoseA_humanoid_root_TranslationInterpolator' toField='set_translation' toNode='Skin_hanim_humanoid_root'/>
 <ROUTE fromField='value_changed' fromNode='PoseA_humanoid_root_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_humanoid_root'/>
  <ROUTE fromField='value_changed' fromNode='PoseA_sacroiliac_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_sacroiliac'/>
@@ -12942,7 +12943,7 @@ keyValue='0 0 1 0 0 0 1 0 0 0 1 1.5 0 0 1 0'/>
         <ROUTE fromField='value_changed' fromNode='PoseA_r_elbow_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_elbow'/>
           <ROUTE fromField='value_changed' fromNode='Default_r_radiocarpal_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_r_radiocarpal'/>
 
-<!--  Pose H Animation to Skin_Joints -->
+<!--  Pose_H_Animation to Skin_Joints -->
 <ROUTE fromField='value_changed' fromNode='PoseH_humanoid_root_TranslationInterpolator' toField='set_translation' toNode='Skin_hanim_humanoid_root'/>
 <ROUTE fromField='value_changed' fromNode='PoseH_humanoid_root_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_humanoid_root'/>
  <ROUTE fromField='value_changed' fromNode='PoseH_sacroiliac_RotationInterpolator' toField='set_rotation' toNode='Skin_hanim_sacroiliac'/>

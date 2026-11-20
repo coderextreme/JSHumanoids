@@ -43,8 +43,12 @@ export default function convertJSON(options) {
 				continue;
 			}
 			var basefile = file.substr(0, file.lastIndexOf("."));
-			var file = basefile+".json";
-			// console.error("Reading", file, domImpl);
+			if (file.endsWith(".x3dj")) {
+				file = basefile+".x3dj";
+			} else {
+				file = basefile+".json";
+			}
+			// console.error("Reading", file);
 			var str = null;
 			if (typeof fs === 'object') {
 				str = fs.readFileSync(file).toString();
@@ -62,7 +66,12 @@ export default function convertJSON(options) {
 				continue;
 			}
 			var NS = "https://www.web3d.org/specifications/x3d";
-			console.error("loading", file, "for conversion");
+			console.warn("loading", file, "for conversion");
+			// swap around meta and component ordering
+			let m = json.X3D.head.meta;
+			let c = json.X3D.head.component;
+			delete json.X3D.head.meta;
+			json.X3D.head.meta = m;
 			loadX3DJS(domImpl, json, file, NS, function(element, xml) {
 				if (typeof element === undefined) {
 					throw ("Undefined element returned from loadX3DJS()")
@@ -89,7 +98,7 @@ export default function convertJSON(options) {
 					let actual_serializer = eval(option.serializer);
 					// console.log(option.serializer, actual_serializer);
 					var co = option.codeOutput+basefile;
-					console.log("serializing:", co);
+					// console.log("serializing:", co, option.serializer);
 					try {
 						str = new actual_serializer().serializeToString(json, element, co, mapToMethod, fieldTypes)
 					} catch (e) {

@@ -62,9 +62,8 @@ JavaScriptSerializer.prototype = {
 				str += this.postcode[postno];
 			}
 		}
-		str += "    "+element.nodeName+0+".toFileX3D(\""+clazz+".new.graal.x3d\");\n";
-		str += "    "+element.nodeName+0+".toFileJSON(\""+clazz+".new.graal.json\");\n";
-		str += "    "+element.nodeName+0+".toFileVRML97(\""+clazz+".new.graal.wrl\");\n";
+		// str += "    "+element.nodeName+0+".toFileX3D(\""+clazz+".new.graaljs.x3d\");\n";
+		// str += "    "+element.nodeName+0+".toFileJSON(\""+clazz+".new.graaljs.x3dj\");\n";
 
 		return str;
 	},
@@ -120,7 +119,7 @@ JavaScriptSerializer.prototype = {
 					var attr = attrs[a].nodeName;
 					if (attr === "containerField") {
 						if (method === "setShaders") {
-							method = "addShaders"
+							method = "addShaders";
 							addpre = "";
 						} else {
 							if (attrs[a].nodeValue === "joints" 
@@ -151,60 +150,80 @@ JavaScriptSerializer.prototype = {
 			method = "setIS";
 			addpre = "";
 		}
+		if (addpre+method === "setPoses") {
+			method = "Child";
+			addpre = "add";
+		}
 		if (addpre+method === "setJoints") {
-			method = "Joints"
+			method = "Joints";
 			addpre = "add";
 		}
 		if (addpre+method === "setSkeleton") {
-			method = "Skeleton"
+			method = "Skeleton";
 			addpre = "add";
 		}
 		if (addpre+method === "setSkin") {
-			method = "Skin"
+			method = "Skin";
+			addpre = "add";
+		}
+		if (addpre+method === "setValue") {                                                                                                      
+			method = "Value";
 			addpre = "add";
 		}
 		if (addpre+method === "setBack") {
-			method = "BackTexture"
+			method = "BackTexture";
 			addpre = "set";
 		}
 		if (addpre+method === "setFront") {
-			method = "FrontTexture"
+			method = "FrontTexture";
 			addpre = "set";
 		}
 		if (addpre+method === "setLeft") {
-			method = "LeftTexture"
+			method = "LeftTexture";
 			addpre = "set";
 		}
 		if (addpre+method === "setRight") {
-			method = "RightTexture"
+			method = "RightTexture";
 			addpre = "set";
 		}
 		if (addpre+method === "setTop") {
-			method = "TopTexture"
+			method = "TopTexture";
 			addpre = "set";
 		}
 		if (addpre+method === "setBottom") {
-			method = "BottomTexture"
+			method = "BottomTexture";
 			addpre = "set";
 		}
 		if (element.nodeName === 'Scene' && addpre+method === "setMetadata") {
-			method = "Metadata"
+			method = "Metadata";
 			addpre = "add";
 		}
 		if (element.nodeName === 'HAnimHumanoid' && addpre+method === "addValue") {
-			method = "Metadata"
+			method = "Metadata";
 			addpre = "set";
 		}
+		if (element.nodeName === 'HAnimHumanoid' && addpre+method === "addMetadata") {
+			method = "Metadata";
+			addpre = "set";
+		}
+		if (element.nodeName === 'Shape' && addpre+method === "addValue") {
+			method = "Metadata";
+			addpre = "set";
+		}
+		if (node.nodeName.startsWith("Metadata") && !element.nodeName.startsWith("Metadata") && addpre+method === "addChild") {
+			method = "Metadata";
+			addpre = "add";
+		}
 		if (node.nodeName === 'LayerSet' && addpre+method === "addChild") {
-			method = "LayerSet"
+			method = "LayerSet";
 			addpre = "add";
 		}
 		if (method === "setShaders") {
-			method = "addShaders"
+			method = "addShaders";
 			addpre = "";
 		}
 		if (element.nodeName === "field" && addpre+method === "addJoints") {
-			method = "Child"
+			method = "Child";
 			addpre = "add";
 		}
 		return prepre+addpre+method;
@@ -409,6 +428,12 @@ JavaScriptSerializer.prototype = {
 					}
 					if (attr === "class") {
 						method = "setCssClass";
+					}
+					if (attr === "id") {
+						method = "setHtmlId";
+					}
+					if (attr === "style" && element.nodeName != "FontStyle" ) {
+						method = "setCssStyle";
 					}
 					
 					str += '.'+method+"("+strval+")";

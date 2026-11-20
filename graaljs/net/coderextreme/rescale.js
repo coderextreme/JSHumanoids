@@ -4,188 +4,118 @@ System.setProperty("polyglot.js.nashorn-compat", "true");
 load('data/X3Dautoclass.js');
 // imports X3D0
 
-
-var HUMANCHILD = 3;
-var height = 1.87;
-var scaledHeight = 0;
-var x = 0;
-var miny = 0;
-var l_x = 0;
-var l_z = 0;
-var r_x = 0;
-var r_z = 0;
-var maxy = 0;
-var z = 0;
-// var scale = [ 1, 1, 1 ];
-var yscale = 1;
-
 main();
 
 function main() {
 	var count = 0;
-	var humanoid = traverseChildrenSceneGraph(X3D0.getScene().getChildren());
-	count++;
-	print("humanoid", typeof humanoid, humanoid, JSON.stringify(humanoid));
-	print(humanoid.getName());
-	print(humanoid.getDEF());
-	var scale = humanoid.getScale();
-	print("scale", JSON.stringify(scale));
-	print("scale input", scale);
-	humanoid.setScale(Java.to([ 1, 1, 1 ], Java.type("double[]")));
-	print("scale output", humanoid.getScale());
-	var root = humanoid.getSkeleton()[0];
-	// for (var i in root) { print(i); }
-	if (root != null) {
-		print("root", root, JSON.stringify(root), root.getName());
-		var center = root.getCenter();
-		print("center", center);
-		print(center[0]+" "+center[1]+" "+center[2]);
-		x = center[0];
-		miny = center[1];
-		maxy = center[1];
-		z = center[2];
+	var humans = "";
+	var scene = X3D0.getScene();
+	for (const humanoid of traverseChildrenSceneGraph(scene.getChildren())){
+		count++;
+		// print("humanoid", typeof humanoid, humanoid, JSON.stringify(humanoid));
+		humans += humanoid.getName();
+		// print(humanoid.getName());
+		print(humanoid.getDEF());
+		var scale = humanoid.getScale();
+		// print("scale", JSON.stringify(scale));
+		print("scale input", scale);
+		humanoid.setScale(Java.to([ 1, 1, 1 ], Java.type("double[]")));
+		print("scale output", humanoid.getScale());
 		var translation = [0, 0, 0];
-		try {
-			centering(root);
-			x = (l_x + r_x) / 2;
-			z = (l_z + r_z) / 2;
-			yscale = maxy - miny;
-			scaledHeight = yscale * scale[1];
-			print("max y "+maxy+" min y "+miny+" yscale "+yscale+" height "+height);
-			transformNode(root, translation, scale, humanoid);
-		} catch (e) {
-			print(e);
-		}
-	} else {
-		var translation = [0, 0, 0];
-		transformNode(humanoid, translation, scale, humanoid);
-		var scene = X3D0.getScene();
-		scale = humanoid.getScale();
-		print("scale", JSON.stringify(scale));
-		translation = [0, 0, 0];
 		transformNode(scene, translation, scale, X3D0);
-		scale = humanoid.getScale();
-		print("scale", JSON.stringify(scale));
-	}
-	
-	X3D0.toFileX3D("../data/"+humanoid.getName()+".scaled"+count+".x3d");
 
-	HUMANCHILD = 3;
-	height = 1.87;
-	scaledHeight = 0;
-	x = 0;
-	miny = 0;
-	l_x = 0;
-	l_z = 0;
-	r_x = 0;
-	r_z = 0;
-	maxy = 0;
-	z = 0;
-	scale = [ 1, 1, 1 ];
-	yscale = 1;
+		scale = [ 1, 1, 1 ];
+	}
+        X3D0.toFileX3D("../data/"+humans+".scaled"+count+".x3d");
 }
 
-function traverseChildrenSceneGraph(children) {
+function* traverseChildrenSceneGraph(children) {
 	if (children !== null) {
 		// print("children", typeof children, JSON.stringify(children));
-		for (var child in children) {
-			var humanoid = traverseChildSceneGraph(children[child]);
-			if (humanoid) {
-				print("Unpacking child in "+child+" succeeded");
-				return humanoid;
-			} else {
-				print("Unpacking child in "+child+" failed");
+		for (const child in children) {
+			for (const humanoid of traverseChildSceneGraph(children[child])) {
+				if (humanoid) {
+					// print("Unpacking child in "+child+" succeeded");
+					yield humanoid;
+				} else {
+					// print("Unpacking child in "+child+" failed");
+				}
 			}
 		}
 	}
 	return null;
 }
 
-function traverseChildSceneGraph(child) {
-	if (child instanceof HAnimHumanoid) {
-		print("humanoid", typeof child, JSON.stringify(child));
-		return child;
+function* traverseChildSceneGraph(child) {
+	if (child.getClass().getName().endsWith("HAnimHumanoid")) {
+		// print("humanoid", typeof child, JSON.stringify(child));
+		yield child;
 	} else if (child !== null) {
 		if ("getChildrenList" in child) {
 			var children = child.getChildrenList();
-			print("children traverse", typeof child, JSON.stringify(child));
-			return traverseChildrenSceneGraph(children);
+			// print("children traverse", typeof child, JSON.stringify(child));
+			for (const humanoid of traverseChildrenSceneGraph(children)) {
+				yield humanoid;
+			}
 		} else {
-			print("No children, child is "+child);
+			// print("No children, child is "+child);
 			return null;
 		}
 	} else {
-		print("Null child is "+child);
+		// print("Null child is "+child);
 		return null;
 	}
 	return null;
 }
-function centering(joint) {
-	var center = joint.getCenter();
-	var name = joint.getName();
-	// print(name);
-	// print(center[0]+" "+center[1]+" "+center[2]+" ");
-	switch (name) {
-		/*
-		case HAnimJoint.NAME_L_TARSAL_DISTAL_INTERPHALANGEAL_5:
-			l_x = center[0];
-			l_z = center[2];
-			break;
-		case HAnimJoint.NAME_R_TARSAL_DISTAL_INTERPHALANGEAL_5:
-			r_x = center[0];
-			r_z = center[2];
-			break;
-		*/
-		case HAnimJoint.NAME_HUMANOID_ROOT:
-			l_x = center[0];
-			l_z = center[2];
-			r_x = center[0];
-			r_z = center[2];
-			break;
-	}
-	if (center[1] >= maxy) {
-		maxy = center[1];
-	}
-	if (center[1] <= miny) {
-		miny = center[1];
-	}
-	var children = joint.getChildrenList();
-	for (var child in children) {
-		if (children[child] instanceof HAnimJoint) {
-			centering(children[child]);
-		}
-	}
-}
+
 function transformPoint(point, point_offset, translation, scale) {
 	var newPoint = point.map(item => item);
 	//print("");
 	//print("point_offset", point_offset);
 	//print("in  trans", translation[0], translation[1], translation[2]);
 	//print("in  scale", scale[0], scale[1], scale[2]);
-	//print("in  point", point[point_offset+0], point[point_offset+1], point[point_offset+2]);
+	print("in  point", point[point_offset+0], point[point_offset+1], point[point_offset+2]);
 
 	newPoint[point_offset+0] = newPoint[point_offset+0] + translation[0];
 	newPoint[point_offset+1] = newPoint[point_offset+1] + translation[1];
 	newPoint[point_offset+2] = newPoint[point_offset+2] + translation[2];
 
-	//print("mid point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
+	// print("mid point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
 	//print("out scale", scale[0], scale[1], scale[2]);
 
 	newPoint[point_offset+0] = newPoint[point_offset+0] * scale[0];
 	newPoint[point_offset+1] = newPoint[point_offset+1] * scale[1];
 	newPoint[point_offset+2] = newPoint[point_offset+2] * scale[2];
 
-	//print("out point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
+	print("out point", newPoint[point_offset+0], newPoint[point_offset+1], newPoint[point_offset+2]);
 	return Java.to(newPoint, Java.type("double[]"));
 }
 function transformNode(node, parentTranslation, scale, parentNode) {
+	if (node == null) {
+		return false;
+	}
 	var storedTranslation = [parentTranslation[0], parentTranslation[1], parentTranslation[2]];
 	var children = null;
-	if (node instanceof HAnimHumanoid) {
-		children = node.getSkin();
-	} else if (node instanceof Scene) {
+	var clzind = node.getClass().getName().lastIndexOf(".");
+	var clz = node.getClass().getName().substring(clzind+1);
+	if (clz == "HAnimHumanoid") {
+		print("clz is "+clz);
+		var coordinate = node.getSkinCoord();
+		var skeleton = node.getSkeleton();
+		if (coordinate == null) {
+			children = node.getSkinList();
+		} else if (coordinate.getUSE()) {
+			children = node.getSkinList();
+		} else {
+			children = [coordinate];
+		}
+		// TODO worry about length
+		children = [...skeleton, ...children];
+		print("humanoid children "+JSON.stringify(children));
+	} else if (clz == "Scene") {
+		print("clz is "+clz);
 		children = node.getChildren();
-	} else if (node instanceof HAnimJoint) {
+	} else if (clz == "HAnimJoint") {
 		var joint = node;
 
 		var translation = joint.getTranslation();
@@ -200,7 +130,8 @@ function transformNode(node, parentTranslation, scale, parentNode) {
 		joint.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));
 
 		children = joint.getChildrenList();
-	} else if (node instanceof HAnimSite) {
+		// print("children are "+children.size());
+	} else if (clz == "HAnimSite") {
 		var site = node;
 
 		var translation = site.getTranslation();
@@ -214,27 +145,27 @@ function transformNode(node, parentTranslation, scale, parentNode) {
 		site.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));
 
 		children = site.getChildrenList();
-	} else if (node instanceof HAnimSegment) {
+	} else if (clz == "HAnimSegment") {
 		var segment = node;
 		var coord = segment.getCoord();
 		if (coord !== null) {
 			if (!transformNode(coord, storedTranslation, scale, node)) {
-				print("Unpacking coord in transformNode() HAnimSegment failed");
+				// print("Unpacking coord in transformNode() HAnimSegment failed");
 			}
 		}
 		var displacers = segment.getDisplacersList();
 		if (displacers !== null) {
 			for (var displacer in displacers) {
 				if (!transformNode(displacers[displacer], storedTranslation, scale, node)) {
-					print("Unpacking displacer in HAnimSegment failed");
+					// print("Unpacking displacer in HAnimSegment failed");
 				}
 			}
 		}
 		children = segment.getChildrenList();
-	} else if (node instanceof Group) {
+	} else if (clz == "Group") {
 		var group = node;
 		children = group.getChildrenList();
-	} else if (node instanceof Transform) {
+	} else if (clz == "Transform") {
 		var transform = node;
 		var translation = transform.getTranslation();
 		storedTranslation[0] += translation[0];
@@ -243,62 +174,66 @@ function transformNode(node, parentTranslation, scale, parentNode) {
 
 		try {
 			if (transform.getDEF() || transform.getName()) {  // add more defaults, so we won't delete the node, if there's more than children data
-				transform.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));  // Transform should be abandoned, but result leads to NO-OP
+				// print("Zeroing transform", transform.getDEF(), transform.getName());
+				// transform.setTranslation(Java.to([0, 0, 0], Java.type("double[]")));  // Transform should be abandoned, but result leads to NO-OP
 				children = transform.getChildrenList();
 			} else {
-				print("Deleting ALL nodes below ", parentNode, parentNode.getDEF(), parentNode.getName(), ", not just the singleton Transform");
+				// print("Moving ALL nodes below ", parentNode, parentNode.getDEF(), parentNode.getName(), ", not just the singleton Transform");
 				let transformArray = transform.getChildren(); 
 				let parentArray = transformArray.clone();
 				// TODO delete the ONE transform, not the whole parentNode array
 				parentNode.setChildren(parentArray);
 				children = parentNode.getChildrenList();
+				// transform.setChildrenList(null);
 			}
 		} catch (e) {
 			print("error ", e);
 		}
 
 
-	} else if (node instanceof Shape) {
+	} else if (clz == "Shape") {
 		var shape = node;
 		var appearance = shape.getAppearance();
 		if (!transformNode(appearance, storedTranslation, scale, node)) {
-			print("Unpacking appearance in Shape failed");
+			// print("Unpacking appearance in Shape failed");
 		}
 		var geometry = shape.getGeometry();
-		if (!transformNode(geometry, storedTranslation, scale, node)) {
+		if (geometry && transformNode(geometry, storedTranslation, scale, node)) {
+			print("Unpacking geometry in Shape succeeded");
+		} else {
 			print("Unpacking geometry in Shape failed");
 		}
-	} else if (node instanceof IndexedFaceSet) {
+	} else if (clz == "IndexedFaceSet") {
+		print("clz is "+clz);
 		var ifs = node;
+		print(ifs.toStringX3D(1));
 		var coord = ifs.getCoord();
-		var coordIndex = ifs.getCoordIndex();
-		if (coordIndex.length > 700) {
-			print("coordIndex "+coordIndex.length);
-			var texCoordIndex = ifs.getTexCoordIndex();
-			print("texCoordIndex "+texCoordIndex.length);
-		}
-		if (coord !== null && !transformNode(coord, storedTranslation, scale, node)) {
-			print("Unpacking coord in IndexedFaceSet failed");
-		}
-	} else if (node instanceof Appearance) {
-	} else if (node instanceof Coordinate) {
+		children = [coord];
+	} else if (clz == "Coordinate") {
+		print("clz is "+clz);
 		var coordinate = node;
 		var point = coordinate.getPoint();
-		// print("point "+point.length);
+		// print("point input "+JSON.stringify(point));
 		for (var p = 0; p < point.length; p += 3) {
 			point = transformPoint(point, p, storedTranslation, scale);
 		}
 		coordinate.setPoint(point);
+		// print("point output "+JSON.stringify(point));
+	} else if (clz == "Appearance") {
+	} else if (clz == "ROUTE") {
+	} else if (clz == "CommentsBlock") {
 	} else if (node !== null) {
 		print("Unhandled node is "+node);
 	} else {
-		print("Node is "+node);
+		// print("Node is "+node);
 		return false;
 	}
 	if (children !== null) {
 		for (var child in children) {
 			var copyTranslation = [storedTranslation[0], storedTranslation[1], storedTranslation[2]];
-			if (children[child] === null || !transformNode(children[child], copyTranslation, scale, node)) {
+			if (children[child] !== null && transformNode(children[child], copyTranslation, scale, node)) {
+				// print("parent is "+clz+" Child "+child);
+			} else {
 				print("Unpacking child "+children[child]+" failed");
 			}
 		}

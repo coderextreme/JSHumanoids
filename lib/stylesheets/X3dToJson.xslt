@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (c) 2001-2025 held by the author(s).  All rights reserved.
+Web3D Consortium Open-Source License for Models and Software
+
+Copyright (c) 1995-2026 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,9 +14,7 @@ are met:
       notice, this list of conditions and the following disclaimer
       in the documentation and/or other materials provided with the
       distribution.
-    * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (https://www.nps.edu and https://www.MovesInstitute.org)
+    * Neither the name of the Web3D Consortium (https://www.web3D.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -48,7 +48,7 @@ POSSIBILITY OF SUCH DAMAGE.
    <meta name="reference"   content="https://www.w3.org/TR/xslt"/>
    <meta name="reference"   content="XML Spy, https://www.xmlspy.com"/>
    <meta name="reference"   content="SAXON XML Toolkit, https://saxon.sourceforge.net"/>
-   <meta name="generator"   content="X3D-Edit 4.0, https://savage.nps.edu/X3D-Edit"/>
+   <meta name="generator"   content="X3D-Edit 4.0, https://www.web3d.org/x3d/tools/X3D-Edit"/>
    <meta name="identifier"  content="https://www.web3d.org/x3d/stylesheets/X3dToJson.xslt"/>
    <meta name="reference"   content="https://sourceforge.net/p/x3d/code/HEAD/tree/www.web3d.org/x3d/stylesheets/X3dToJson.xslt"/>
    <meta name="license"     content="license.html"/>
@@ -597,6 +597,8 @@ POSSIBILITY OF SUCH DAMAGE.
                         <xsl:call-template name="print-indent"><xsl:with-param name="indent" select="$indent"/></xsl:call-template>
 
                         <xsl:variable name="SFNodeType" select="
+                            ($fieldName = 'acousticProperties') or ($fieldName = 'baseTexture')        or ($fieldName = 'emissiveTexture')    or 
+                            ($fieldName = 'normalTexture')      or ($fieldName = 'occlusionTexture')   or ($fieldName = 'metallicRoughnessTexture') or 
                             ($fieldName = 'back')               or ($fieldName = 'bottom')             or ($fieldName = 'front')              or 
                             ($fieldName = 'left')               or ($fieldName = 'right')              or ($fieldName = 'top')                or 
                             ($fieldName = 'backTexture')        or ($fieldName = 'bottomTexture')      or ($fieldName = 'frontTexture')       or 
@@ -607,10 +609,13 @@ POSSIBILITY OF SUCH DAMAGE.
                             ($fieldName = 'controlPoint')       or ($fieldName = 'controlPoints')      or ($fieldName = 'crossSectionCurve')  or
                             ($fieldName = 'emitter')            or ($fieldName = 'fillProperties')     or
                             ($fieldName = 'fogCoord')           or ($fieldName = 'fontStyle')          or ($fieldName = 'geoOrigin')          or
-                            ($fieldName = 'geometry')           or ($fieldName = 'geometry1')          or ($fieldName = 'geometry2')          or
+			(($fieldName = 'geometry') and not($parentName='RigidBody'))
+		       or ($fieldName = 'geometry1')          or ($fieldName = 'geometry2')          or
+
                             ($fieldName = 'gradients')          or ($fieldName = 'layout')             or ($fieldName = 'lineProperties')     or
                             ($fieldName = 'massDensityModel')   or ($fieldName = 'material')           or
-                            ($fieldName = 'metadata')           or ($fieldName = 'normal')             or ($fieldName = 'pickingGeometry')    or
+                            ($fieldName = 'metadata')           or ($fieldName = 'normal')             or ($fieldName = 'tangent')             or 
+                            ($fieldName = 'pickingGeometry')    or
                             ($fieldName = 'profileCurve')       or ($fieldName = 'proxy')              or 
                             ($fieldName = 'segmentIdentifiers') or ($fieldName = 'skinCoord')          or ($fieldName = 'skinNormal')         or
                             ($fieldName = 'surface')            or ($fieldName = 'surfaceNormals')     or
@@ -621,8 +626,6 @@ POSSIBILITY OF SUCH DAMAGE.
                             ($fieldName = 'weightTransferFunction2') or
                             (($fieldName = 'renderStyle')       and (($parentName='BlendedVolumeStyle') or ($parentName='VolumeData')))     or
                             (($fieldName = 'source')            and ($parentName='Sound'))                                                  or
-                            (($fieldName = 'viewport')          and ($parentName='LayoutLayer'))                                            or
-                            (($fieldName = 'acousticProperties')          and ($parentName='Appearance'))                                  or
                             (($fieldName = 'texCoord')          and not($parentName='MultiTextureCoordinate'))                              or 
                             (($fieldName = 'texture')           and not(($parentName='ComposedTexture3D') or ($parentName='MultiTexture'))) or
                             (($fieldName = 'textureTransform')  and not($parentName='MultiTextureTransform'))                               or
@@ -1057,7 +1060,7 @@ POSSIBILITY OF SUCH DAMAGE.
                         </xsl:call-template>
                         <xsl:text>"</xsl:text>
                     </xsl:when>
-					<!-- string array -->
+                    <!-- string array -->
                     <xsl:when test="($attributeType = 'MFString') or
                                     ((local-name()='value') and ((../@type='MFString') or (contains(local-name(../..),'Proto') and ($fieldValueType='MFString')))) or
                                      (local-name()='url') or ends-with(local-name(),'Url') or
@@ -1075,8 +1078,9 @@ POSSIBILITY OF SUCH DAMAGE.
                                     ((local-name(..)='CollisionCollection') and (local-name()='appliedParameters')) or
                                     ((local-name(..)='GeoViewpoint')        and (local-name()='navType')) or
                                      (local-name()='objectType')">
-                        <!-- debug fieldValue, Text -->
+                    <!-- debug fieldValue, Text, NavigationInfo -->
                     <xsl:if test="$debugTrace">
+                        <!--
                             <xsl:if test="(local-name(..) = 'fieldValue') and (local-name() = 'value')">
                                 <xsl:message>
                                     <xsl:text>[@* MFString handling performed] </xsl:text>
@@ -1099,6 +1103,19 @@ POSSIBILITY OF SUCH DAMAGE.
                                     <xsl:value-of select="$normalizedValue"/>
                                 </xsl:message>
                             </xsl:if>
+                        -->
+                            <xsl:if test="(local-name(..) = 'NavigationInfo') and (local-name() = 'type')">
+                                <xsl:message>
+                                    <xsl:text>[@* MFString handling performed]</xsl:text>
+                                    <xsl:value-of select="local-name(..)"/>
+                                    <xsl:text> string=</xsl:text>
+                                    <xsl:value-of select="$normalizedValue"/>
+                                    <xsl:text> type MFString, $attributeType=</xsl:text>
+                                    <xsl:value-of select="$attributeType"/>
+                                    <xsl:text>, $normalizedValue=</xsl:text>
+                                    <xsl:value-of select="$normalizedValue"/>
+                                </xsl:message>
+                            </xsl:if>
                         </xsl:if>
                         <xsl:text>[</xsl:text>
                         
@@ -1108,7 +1125,7 @@ POSSIBILITY OF SUCH DAMAGE.
                                 <xsl:with-param name="inputType"><xsl:text>MFString</xsl:text></xsl:with-param>
                             </xsl:call-template>
                         </xsl:variable>
-                        <!-- debug-->
+                        <!-- debug  true() or -->
                         <xsl:if test="$debugTrace">
                             <xsl:message>
                                 <xsl:text>[@* confirming] $escape-special-characters-quotes-recurse-result=</xsl:text>
@@ -1137,11 +1154,11 @@ POSSIBILITY OF SUCH DAMAGE.
                                 <xsl:text>&quot;</xsl:text>     
                                 <xsl:call-template name="trace">
                                     <xsl:with-param name="message">
-                                        <xsl:text> warning: wrapped missing &quot;quote marks&quot; around single-string value for MFString @</xsl:text>
+                                        <xsl:text> notification: wrapped missing &quot;quote marks&quot; around single-string value for MFString @</xsl:text>
                                         <xsl:value-of select="local-name()"/>
                                         <xsl:text>='</xsl:text>
                                         <xsl:value-of select="."/>
-                                        <xsl:text>' and be sure to fix source file!</xsl:text>
+                                        <xsl:text>'</xsl:text>
                                         <xsl:if test="($traceScripts = 'true')">
                                             <xsl:text>&#10;</xsl:text>
                                             <xsl:value-of select="."/>
@@ -1194,20 +1211,22 @@ POSSIBILITY OF SUCH DAMAGE.
                                         starts-with($attributeType,'SFVec') or starts-with($attributeType,'MFVec') or contains($attributeType,'Matrix') or 
                                     ((local-name()='value') and 
                                         starts-with($attributeType, 'SFVec') or starts-with($attributeType, 'MFVec')   or
-                                        contains($attributeType, 'Color')  or    contains($attributeType, 'Rotation')) or
+                                        contains($attributeType, 'Color')  or    contains($attributeType, 'Rotation')  or contains($attributeType, 'Quaternion')) or
                                     contains($attributeType, 'Matrix')  or
                                     ((local-name()='value') and 
-                                        (          (../@type='MFFloat')    or  
-                                                   (../@type='MFDouble')   or            (../@type='MFTime')         or
-                                                   (../@type='SFRotation') or            (../@type='MFRotation')     or
-                                        starts-with(../@type,'SFVec')      or starts-with(../@type,'MFVec')          or
-                                           contains(../@type,'Color')      or    contains(../@type,'Matrix')))       or
+                                        (          (../@type='MFFloat')      or  
+                                                   (../@type='MFDouble')     or            (../@type='MFTime')          or
+                                                   (../@type='SFQuaternion') or            (../@type='MFQuaternion')    or
+                                                   (../@type='SFRotation')   or            (../@type='MFRotation')      or
+                                        starts-with(../@type,'SFVec')        or starts-with(../@type,'MFVec')           or
+                                           contains(../@type,'Color')        or    contains(../@type,'Matrix')))        or
                                     (contains(local-name(../..),'Proto') and 
-                                        (  ($fieldValueType='MFFloat')     or
-                                           ($fieldValueType='MFDouble')    or        ($fieldValueType='MFTime')      or
-                                           ($fieldValueType='SFRotation')  or        ($fieldValueType='MFRotation')  or
-                                starts-with($fieldValueType,'SFVec')       or starts-with($fieldValueType,'MFVec')   or
-                                   contains($fieldValueType,'Color')       or    contains($fieldValueType,'Matrix')))">
+                                        (  ($fieldValueType='MFFloat')       or
+                                           ($fieldValueType='MFDouble')      or        ($fieldValueType='MFTime')       or
+                                           ($fieldValueType='SFQuaternion')  or        ($fieldValueType='MFQuaternion') or
+                                           ($fieldValueType='SFRotation')    or        ($fieldValueType='MFRotation')   or
+                                starts-with($fieldValueType,'SFVec')         or starts-with($fieldValueType,'MFVec')    or
+                                   contains($fieldValueType,'Color')         or    contains($fieldValueType,'Matrix')))">
                         <xsl:text>[</xsl:text>
                         <!--  array values require comma between values in JSON encoding -->
                         <xsl:call-template name="output-reals">
@@ -1490,7 +1509,7 @@ POSSIBILITY OF SUCH DAMAGE.
         <xsl:variable name="inputString" select="string($inputValue)"/>
 
         <!-- debug (also use trace messages below) -->
-        <xsl:variable name="debugTrace" select="false()"/><!-- true() false() -->
+        <xsl:variable name="debugTrace" select="true"/><!-- true() false() -->
         <xsl:variable name="debugMessage">
                 <xsl:text>[e-s-c-q-r input][local-name()=</xsl:text>
                 <xsl:value-of select="local-name()"/>
@@ -1543,7 +1562,7 @@ POSSIBILITY OF SUCH DAMAGE.
       </xsl:variable>
 
       <!-- debug (also use trace messages below) -->
-      <xsl:variable name="debugTrace" select="false()"/><!-- true() false() -->
+      <xsl:variable name="debugTrace" select="false()"/><!-- true() false() (local-name() = 'type') -->
       <xsl:variable name="debugMessage">
           <xsl:text>[e-q-c-r input][local-name()=</xsl:text>
           <xsl:value-of select="local-name()"/>
@@ -1801,17 +1820,19 @@ POSSIBILITY OF SUCH DAMAGE.
           <xsl:if test="$debugTrace"><xsl:message><xsl:text>[e-q-c-r][4.0]</xsl:text><xsl:value-of select="$debugMessage"/></xsl:message></xsl:if>
           <xsl:text>"</xsl:text>
         </xsl:when>
+        <!-- strip intermediate comma between bracketing quotes in normalized string -->
         <xsl:when test="starts-with(normalize-space($inputString),'&quot; &quot;')  or starts-with(normalize-space($inputString),'&quot;, &quot;') or
                         starts-with(normalize-space($inputString),'&quot; ,&quot;') or starts-with(normalize-space($inputString),'&quot; , &quot;')">
             <xsl:if test="$debugTrace"><xsl:message><xsl:text>[e-q-c-r][4.1]</xsl:text><xsl:value-of select="$debugMessage"/></xsl:message></xsl:if>
-            <xsl:text>","</xsl:text>
+            <!-- <xsl:text>","</xsl:text> -->
             <xsl:call-template name="escape-quote-characters-recurse">
+                <!-- follow second quote, skip intermediate comma (if any) -->
                 <xsl:with-param name="inputText" select="substring-after(substring-after($inputString,'&quot;'),'&quot;')"/>
                 <xsl:with-param name="inputType" select="$inputType"/>
                 <xsl:with-param name="firstPass"><xsl:value-of select="false()"/></xsl:with-param>
             </xsl:call-template>
         </xsl:when>
-        <!-- IMPORTANT: starting and ending quotes indicate outer delimiters of MFString array; output " and process/split string values hereafter... -->
+        <!-- IMPORTANT: starting and ending quotes indicate outer delimiters of MFString array elements; output " and process/split string values hereafter... -->
         <xsl:when test="starts-with($inputString,'&quot;') and ends-with($inputString,'&quot;') and not(ends-with($inputString,'\&quot;'))
 		  and not(starts-with(normalize-space($inputString),'&quot;,')) and not(starts-with(normalize-space($inputString),'&quot; ,'))">
             <xsl:if test="$debugTrace"><xsl:message><xsl:text>[e-q-c-r][4.2]</xsl:text><xsl:value-of select="$debugMessage"/></xsl:message></xsl:if>
@@ -1942,14 +1963,14 @@ POSSIBILITY OF SUCH DAMAGE.
                 <xsl:with-param name="firstPass"><xsl:value-of select="false()"/></xsl:with-param>
             </xsl:call-template>
         </xsl:when>
-        <!-- finish quoted SFString value and continue with next quoted SFString value -->
+        <!-- finish quoted SFString value then continue with remaining SFString values -->
         <xsl:when test="($inputType = 'MFString') and contains($inputString,'&quot;') and contains(substring-after($inputString,'&quot;'),'&quot;')">
             <xsl:if test="$debugTrace"><xsl:message><xsl:text>[e-q-c-r][8.2]</xsl:text><xsl:value-of select="$debugMessage"/></xsl:message></xsl:if>
-            <xsl:value-of select="substring-before(substring-after($inputString,'&quot;'),'&quot;')"/>
-            <xsl:text disable-output-escaping="yes">","</xsl:text>
+        <!--<xsl:value-of select="substring-before(substring-after($inputString,'&quot;'),'&quot;')"/> -->
             <xsl:value-of select="substring-before($inputString,'&quot;')"/>
+            <xsl:text disable-output-escaping="yes">","</xsl:text>
             <xsl:call-template name="escape-quote-characters-recurse">
-                <xsl:with-param name="inputText" select="substring-after(substring-after($inputString,'&quot;'),'&quot;')"/>
+                <xsl:with-param name="inputText" select="substring($inputString,string-length(substring-before($inputString,'&quot;')) + 1)"/>
                 <xsl:with-param name="inputType" select="$inputType"/>
                 <xsl:with-param name="firstPass"><xsl:value-of select="false()"/></xsl:with-param>
             </xsl:call-template>
@@ -2575,6 +2596,7 @@ POSSIBILITY OF SUCH DAMAGE.
                       not( local-name()='tailTime' and (string(.)='0' or string(.)='0.0')) and
                       not( local-name()='shadows' and string(.)='false') and
                       not( local-name()='shadowIntensity' and (string(.)='1' or string(.)='1.0')) and
+                      not( local-name()='smooth' and string(.)='true') and
                       not( local-name()='visible' and string(.)='true') and
                       not( local-name(..)='AudioClip'	and
                       ((local-name()='loop' and string(.)='false') or
@@ -2674,7 +2696,8 @@ POSSIBILITY OF SUCH DAMAGE.
                       (local-name()='solid' and string(.)='true') or
                       (local-name()='creaseAngle' and (string(.)='0' or string(.)='0.0')))) and
                       not( local-name(..)='IndexedLineSet' and local-name()='colorPerVertex' and string(.)='true') and
-                      not( local-name(..)='Inline' and ((local-name()='load' and string(.)='true') or (local-name()='global' and string(.)='false'))) and
+                      not( local-name(..)='Inline'         and ((local-name()='load' and string(.)='true') or (local-name()='global' and string(.)='false'))) and
+                      not( local-name(..)='InlineGeometry' and ((local-name()='load' and string(.)='true') or (local-name()='solid' and string(.)='false'))) and
                       not( local-name(..)='LoadSensor' and
                       ((local-name()='enabled' and string(.)='true') or
                       (local-name()='timeOut' and (string(.)='0' or string(.)='0.0')))) and
@@ -3086,6 +3109,7 @@ POSSIBILITY OF SUCH DAMAGE.
                       not((local-name()='containerField' and string(.)='color')            and (local-name(..)='Color' or local-name(..)='ColorRGBA')) and
                       not((local-name()='containerField' and string(.)='coord')            and ((local-name(..)='Coordinate') or (local-name(..)='CoordinateDouble') or (local-name(..)='GeoCoordinate'))) and
                       not((local-name()='containerField' and string(.)='normal')           and (local-name(..)='Normal')) and
+                      not((local-name()='containerField' and string(.)='tangent')          and (local-name(..)='Tangent')) and
                       not((local-name()='containerField' and string(.)='texture')          and (local-name(..)='ImageTexture' or local-name(..)='PixelTexture' or local-name(..)='MovieTexture' or local-name(..)='MultiTexture' or local-name(..)='ComposedTexture3D' or local-name(..)='ImageTexture3D' or local-name(..)='PixelTexture3D' or local-name(..)='GeneratedCubeMapTexture')) and
                       not((local-name()='containerField' and string(.)='fontStyle')        and (local-name(..)='FontStyle')) and
                       not((local-name()='containerField' and string(.)='texCoord')         and (local-name(..)='TextureCoordinate' or local-name(..)='TextureCoordinateGenerator')) and
@@ -3152,6 +3176,11 @@ POSSIBILITY OF SUCH DAMAGE.
                       not(local-name(..)='DISEntityTypeMapping' and 
                       ((local-name()='containerField') and (string(.)='mapping')) or
                       ((local-name()='category' or local-name()='country' or local-name()='domain' or local-name()='extra' or local-name()='kind' or local-name()='specific' or local-name()='subcategory') and (string(.)='0')))" />
+        <xsl:variable name="notDefaultGaussianSplats"
+                      select="not(local-name(..)='GaussianSplats' and
+                      ((local-name()='containerField' and (string(.)='children')) or
+                       ((local-name()='pointerEvents') and (string(.)='true')) or
+                       ((local-name()='colorSpace') and (string(.)='SRGB_REC709_DISPLAY' or string(.)='LIN_REC709_DISPLAY'))))" />
         <xsl:variable name="notDefaultGeo"
                       select="not((starts-with(local-name(..),'Geo') or (local-name(..)='EspduTransform') or contains(local-name(..),'Pdu')) and 
                       ((local-name()='containerField' and (string(.)='children')) or
@@ -3185,6 +3214,7 @@ POSSIBILITY OF SUCH DAMAGE.
                        (local-name()='rotation' and (string(.)='0 0 1 0' or string(.)='0.0 0.0 1.0 0.0' or string(.)='0 1 0 0' or string(.)='0.0 1.0 0.0 0.0' or string(.)='0 1 0 0.0'  or string(.)='0 0 1 0.0')) or
                        (local-name()='scale' and (string(.)='1 1 1' or string(.)='1.0 1.0 1.0')) or
                        (local-name()='scaleOrientation' and (string(.)='0 0 1 0' or string(.)='0.0 0.0 1.0 0.0' or string(.)='0 1 0 0' or string(.)='0.0 1.0 0.0 0.0' or string(.)='0 1 0 0.0'  or string(.)='0 0 1 0.0')) or
+                       ((local-name()='ulimit' or local-name()='llimit') and (string(.)='0 0 0' or string(.)='0.0 0.0 0.0')) or
                        (local-name()='stiffness' and (string(.)='0 0 0' or string(.)='0.0 0.0 0.0')) or
                        (local-name()='translation' and (string(.)='0 0 0' or string(.)='0.0 0.0 0.0')))) and
                       not( local-name(..)='HAnimSegment' and
@@ -3446,33 +3476,34 @@ POSSIBILITY OF SUCH DAMAGE.
                 (count(//ds:Signature) > 0) or
                 (local-name(..)='HAnimHumanoid' and local-name()='version') or(count(//ds:Signature) > 0) or
                 (
-                $notImplicitEvent1 and
-                $notImplicitEvent2 and
-                $notImplicitEvent3 and
-                $notDefaultFieldValue1 and
-                $notDefaultFieldValue1a and
-                $notDefaultFieldValue2 and
-                $notDefaultFieldValue3 and
-                $notDefaultFieldValue4 and
-                $notDefaultFieldValue5 and
-                $notDefaultFieldValue6 and
-                $notDefaultFieldValue7 and
-                $notDefaultFieldValue8 and
-                $notDefaultFieldValue9 and
-                $notDefaultFieldValue10 and
-                $notDefaultCAD         and
-                $notDefaultDIS1        and
-                $notDefaultDIS2        and
-                $notDefaultDIS3        and
-                $notDefaultDIS4        and
-                $notDefaultGeo         and
-                $notDefaultHAnim1      and
-                $notDefaultHAnim2      and
-                $notDefaultNurbs       and
-                $notDefaultGeometry2D  and
-                $notDefaultVolume      and
-                $notDefaultFollower    and
-                $notDefaultShader      and
+                $notImplicitEvent1          and
+                $notImplicitEvent2          and
+                $notImplicitEvent3          and
+                $notDefaultFieldValue1      and
+                $notDefaultFieldValue1a     and
+                $notDefaultFieldValue2      and
+                $notDefaultFieldValue3      and
+                $notDefaultFieldValue4      and
+                $notDefaultFieldValue5      and
+                $notDefaultFieldValue6      and
+                $notDefaultFieldValue7      and
+                $notDefaultFieldValue8      and
+                $notDefaultFieldValue9      and
+                $notDefaultFieldValue10     and
+                $notDefaultCAD              and
+                $notDefaultDIS1             and
+                $notDefaultDIS2             and
+                $notDefaultDIS3             and
+                $notDefaultDIS4             and
+                $notDefaultGaussianSplats   and
+                $notDefaultGeo              and
+                $notDefaultHAnim1           and
+                $notDefaultHAnim2           and
+                $notDefaultNurbs            and
+                $notDefaultGeometry2D       and
+                $notDefaultVolume           and
+                $notDefaultFollower         and
+                $notDefaultShader           and
                 $notDefaultRigidBodyPhysics and
                 $notDefaultContainerField1  and
                 $notDefaultContainerField2  and
@@ -3891,6 +3922,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($attributeName='pickable')          or
                     ($attributeName='rtpHeaderExpected') or
                     ($attributeName='shadows')           or
+                    ($attributeName='smooth')            or
                     ($attributeName='solid')             or
                     ($attributeName='spatialize')        or
                     ($attributeName='trackCurrentView')  or
@@ -4104,6 +4136,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($parentElementName='LoadSensor'           and ($attributeName='progress'))  or
                     (ends-with($parentElementName,'Material')  and ($attributeName='ambientIntensity' or $attributeName='metallic' or $attributeName='normalScale' or $attributeName='occlusionStrength' or $attributeName='roughness' or $attributeName='shininess' or $attributeName='transparency')) or
                     ($parentElementName='ParticleSystem'       and ($attributeName='lifetimeVariation' or $attributeName='particleLifetime')) or
+                    ($parentElementName='PointProperties'      and (starts-with($attributeName,'pointSize'))) or
                     ($parentElementName='TwoSidedMaterial'     and ($attributeName='backAmbientIntensity' or $attributeName='backShininess' or $attributeName='backTransparency')) or
                     ($parentElementName='MotorJoint'           and (starts-with($attributeName,'axis') or starts-with($attributeName,'stop'))) or
                     ($parentElementName='MovieTexture'         and ($attributeName='pitch' or $attributeName='speed')) or
@@ -4333,11 +4366,10 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($parentElementName='PositionInterpolator'       and $attributeName='keyValue') or
                     ($parentElementName='SplinePositionInterpolator' and ($attributeName='keyValue' or $attributeName='keyVelocity')) or
                     ($parentElementName='RigidBody'                  and ($attributeName='forces'   or $attributeName='torques')) or
-                    (contains($parentElementName,'Coordinate') and $attributeName='point') or
-                    ($parentElementName='Extrusion' and $attributeName='spine') or
-                    ($parentElementName='Normal' and $attributeName='vector') or
-                    ($parentElementName='HAnimDisplacer' and $attributeName='displacements') or
-                    ($parentElementName='XvlShell' and ($attributeName='edgeBeginVector' or $attributeName='edgeEndVector'))">
+                    (contains($parentElementName,'Coordinate')       and $attributeName='point') or
+                    ($parentElementName='Extrusion'                  and $attributeName='spine') or
+                    ($parentElementName='HAnimDisplacer'             and $attributeName='displacements') or
+                    ($parentElementName='XvlShell'                   and ($attributeName='edgeBeginVector' or $attributeName='edgeEndVector'))">
 			  <xsl:text>MFVec3f</xsl:text>
 		  </xsl:when>
 		  <!-- SFVec4f -->
@@ -4347,6 +4379,23 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($parentElementName='OrthoViewpoint' and $attributeName='fieldOfView') or 
                     ($parentElementName='TextureProjectorParallel' and $attributeName='fieldOfView')">
 			  <xsl:text>SFVec4f</xsl:text>
+		  </xsl:when>
+		  <!-- MFVec4f -->
+		  <xsl:when test="
+                    ($localFieldType='MFVec4f') or
+                    ($parentElementName='Tangent'                    and $attributeName='vector')">
+			  <xsl:text>MFVec4f</xsl:text>
+		  </xsl:when>
+		  <!-- SFQuaternion -->
+		  <xsl:when test="
+                    ($localFieldType='SFQuaternion')">
+			  <xsl:text>SFQuaternion</xsl:text>
+		  </xsl:when>
+		  <!-- MFQuaternion -->
+		  <xsl:when test="
+                    ($localFieldType='MFQuaternion')    or 
+                    ($parentElementName='GaussianSplats' and ($attributeName='orientations'))">
+			  <xsl:text>MFQuaternion</xsl:text>
 		  </xsl:when>
 		  <!-- SFRotation -->
 		  <!-- note TextureTransform tests must precede these default checks -->
@@ -4403,7 +4452,7 @@ POSSIBILITY OF SUCH DAMAGE.
 		  <!-- SFNode -->
 		  <xsl:when test="
                     ($localFieldType='SFNode')    or 
-                    ($attributeName='attrib') or ($attributeName='color') or ($attributeName='coord') or ($attributeName='normal') or ($attributeName='texCoord') or 
+                    ($attributeName='attrib') or ($attributeName='color') or ($attributeName='coord') or ($attributeName='normal') or ($attributeName='tangent') or ($attributeName='texCoord') or 
                     ($attributeName='body1')  or ($attributeName='body2') or ($attributeName='geometry1')  or ($attributeName='geometry2') or 
                     (($parentElementName='MetadataSet')         and  $attributeName='metadata') or
                     (($parentElementName='CollidableOffset')    and  $attributeName='collidable') or
@@ -4415,7 +4464,9 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($parentElementName='Appearance'            and (($attributeName='material')       or ($attributeName='texture')          or ($attributeName='textureTransform') or ($attributeName='acousticProperties') or
                     ($attributeName='fillProperties') or ($attributeName='lineProperties')  or ($attributeName='pointProperties'))) or
                     ($parentElementName='PhysicalMaterial'      and (($attributeName='baseTexture')    or ($attributeName='emissiveTexture') or ($attributeName='metallicRoughnessTexture') or ($attributeName='normalTexture') or ($attributeName='occlusionTexture'))) or
-                    ($parentElementName='UnlitMaterial'         and (($attributeName='baseTexture')    or ($attributeName='emissiveTexture')                                                or ($attributeName='normalTexture')))">
+                    ($parentElementName='UnlitMaterial'         and (($attributeName='baseTexture')    or ($attributeName='emissiveTexture')                                                or ($attributeName='normalTexture'))) or
+                    (starts-with($parentElementName,'Layout')    and  $attributeName='viewport') or
+                    (contains($parentElementName,'Viewpoint')    and  $attributeName='navigationInfo')">
 			  <xsl:text>SFNode</xsl:text>
 		  </xsl:when>
 		  <!-- MFNode -->
@@ -4425,6 +4476,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     ($parentElementName='DISEntityManager' and ($attributeName='addedEntities' or $attributeName='removedEntities')) or
                     ($attributeName='bodies') or ($attributeName='collidables') or ($attributeName='contacts') or
                     (($parentElementName='RigidBodyCollection') and  $attributeName='joints') or
+                    (($parentElementName='RigidBody')           and  $attributeName='geometry') or
                     ($parentElementName='MetadataSet' and $attributeName='metadata') or
                     ($parentElementName='Appearance'  and $attributeName='shaders')">
 			  <xsl:text>MFNode</xsl:text>
