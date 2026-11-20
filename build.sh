@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm install
+npm install --package-lock-only && npm ci
 
 export JAVA_HOME="C:/Users/john/Downloads/openjdk-21_windows-x64_bin/jdk-21"
 
